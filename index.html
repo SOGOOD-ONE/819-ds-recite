@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>819 数据结构 · 背诵</title>
+<style>
+:root{
+  --ink:#18181b; --sub:#5f5f68; --faint:#a1a1aa;
+  --line:rgba(228,228,231,.95); --line2:rgba(228,228,231,.55);
+  --accent:#002FA7; --accent-soft:rgba(0,47,167,.06);
+  --ok:#15803d; --ok-bg:#f2fdf5;
+  --warn:#b45309; --warn-bg:#fffbeb;
+  --bad:#b91c1c; --bad-bg:#fef4f4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:#fff;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:760px;margin:0 auto}
+
+header{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 14px 10px;border-bottom:1px solid var(--line2);background:#fff;
+  padding-top:calc(12px + env(safe-area-inset-top));
+}
+.brand{font-size:16px;font-weight:600;letter-spacing:.2px}
+.brand small{display:block;font-size:11px;font-weight:400;color:var(--faint);letter-spacing:.3px;line-height:1.2}
+.seg{display:flex;background:#f4f4f5;border-radius:12px;padding:3px;flex:0 0 auto}
+.seg button{
+  border:0;background:transparent;color:var(--sub);font-size:13px;font-weight:500;
+  font-family:inherit;padding:6px 14px;border-radius:9px;cursor:pointer;transition:.15s;
+}
+.seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+
+main{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 20px}
+main.no-pad{padding:0}
+.hidden{display:none!important}
+
+/* 过滤区 */
+.toolbar{display:flex;flex-direction:column;gap:10px;padding:0 0 4px}
+.search{
+  width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;
+  padding:9px 12px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;
+}
+.search:focus{border-color:rgba(0,47,167,.35)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--sub);
+  font-size:12.5px;font-family:inherit;padding:5px 11px;border-radius:999px;cursor:pointer;
+  transition:.15s;white-space:nowrap;
+}
+.chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:500}
+.count{font-size:12px;color:var(--faint);padding:0 2px 6px}
+
+/* 卡片 */
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 1px 2px rgba(0,0,0,.03);padding:13px 14px;margin-bottom:10px;
+}
+.chead{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.no{font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums;font-family:ui-monospace,Consolas,monospace}
+.tag{font-size:11px;line-height:1.6;padding:1px 7px;border-radius:6px;border:1px solid var(--line);color:var(--sub);background:#fafafa}
+.tag.b{color:var(--accent);border-color:rgba(0,47,167,.25);background:var(--accent-soft)}
+.tag.k{color:#3f3f46;background:#f4f4f5;border-color:transparent}
+.grow{flex:1 1 auto}
+.chev{color:var(--faint);font-size:16px;transition:transform .2s;line-height:1}
+.card.open .chev{transform:rotate(90deg)}
+.q{font-size:14.5px;line-height:1.72}
+.card.open .q{margin-bottom:10px}
+.body{display:none;border-top:1px solid var(--line2);padding-top:10px}
+.card.open .body{display:block}
+.src{font-size:12px;color:var(--faint);margin-bottom:8px;line-height:1.6}
+.ansp{margin:0 0 9px;font-size:13.5px;line-height:1.78;color:#27272a}
+.idea{font-size:13.5px;color:#27272a;margin-bottom:9px}
+.idea b{color:var(--accent);font-weight:600}
+
+/* 代码 */
+.codewrap{position:relative;border:1px solid var(--line);border-radius:12px;background:#fcfcfd;overflow:hidden}
+pre.code{
+  margin:0;padding:11px 12px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:12.5px;line-height:1.7;white-space:pre;color:#1f2937;
+}
+.btn-copy{
+  position:absolute;top:7px;right:7px;border:1px solid var(--line);background:#fff;
+  color:var(--sub);font-size:11.5px;font-family:inherit;padding:3px 9px;border-radius:8px;cursor:pointer;
+}
+.btn-copy:hover{color:var(--accent);border-color:rgba(0,47,167,.3)}
+.btn-copy.ok{color:var(--ok);border-color:rgba(21,128,61,.3);background:var(--ok-bg)}
+.tagline{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--faint);margin-top:8px}
+
+/* 统计 */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 14px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.stat b{display:block;font-size:22px;line-height:1.25;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
+.stat span{font-size:11.5px;color:var(--faint)}
+.sec-title{font-size:12.5px;color:var(--faint);margin:2px 0 8px;letter-spacing:.4px}
+.big-btn{
+  width:100%;border:1px solid var(--accent);background:var(--accent);color:#fff;
+  font-size:15px;font-weight:500;font-family:inherit;padding:14px;border-radius:16px;cursor:pointer;
+}
+.big-btn:active{opacity:.9}
+.ghost-btn{
+  width:100%;border:1px solid var(--line);background:#fff;color:var(--sub);
+  font-size:14px;font-family:inherit;padding:12px;border-radius:16px;cursor:pointer;margin-top:9px;
+}
+.hint{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.7}
+.bar{height:3px;border-radius:2px;background:#f4f4f5;overflow:hidden;margin:0 0 12px}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.sess-head{display:flex;justify-content:space-between;font-size:12px;color:var(--faint);margin-bottom:6px}
+.qcard{min-height:120px}
+.sesscard .q{font-size:15.5px;line-height:1.8}
+
+/* 底部操作区（拇指热区） */
+footer#foot{
+  flex:0 0 auto;border-top:1px solid var(--line2);background:#fff;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+}
+.rate-row{display:flex;gap:9px}
+.rate{
+  flex:1 1 0;border:1px solid var(--line);background:#f4f4f5;color:#3f3f46;
+  font-size:14.5px;font-weight:500;font-family:inherit;padding:13px 4px;border-radius:14px;cursor:pointer;
+  transition:.12s;
+}
+.rate:active{transform:scale(.985)}
+.rate.bad{color:var(--bad);background:var(--bad-bg);border-color:rgba(185,28,28,.18)}
+.rate.fuzzy{color:var(--warn);background:var(--warn-bg);border-color:rgba(180,83,9,.18)}
+.rate.ok{color:var(--ok);background:var(--ok-bg);border-color:rgba(21,128,61,.2)}
+.reveal{
+  width:100%;border:1px solid var(--line);background:#fff;color:var(--accent);
+  font-size:15px;font-weight:500;font-family:inherit;padding:14px;border-radius:16px;cursor:pointer;
+}
+.empty{text-align:center;color:var(--faint);font-size:13.5px;padding:40px 10px;line-height:1.9}
+footer#foot .tip{font-size:11.5px;color:var(--faint);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">819 数据结构<small>真题 53 · 押题 40 · 共 93 题</small></div>
+    <div class="seg">
+      <button id="m-browse" data-mode="browse">浏览</button>
+      <button id="m-quiz" data-mode="quiz">自测</button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <footer id="foot" class="hidden"></footer>
+</div>
+<script src="./data.js"></script>
+<script>
+(function(){
+  var BANK = window.QBANK || [];
+  var LS = 'ds819_progress_v1';
+  var STAGES = [1, 2, 4, 7];   // 复习曲线：1 → 2 → 4 → 7 天，之后固定 7 天
+  var DAY = 86400000;
+  var SESSION_MAX = 20;
+
+  var mode = 'browse';
+  var bFilter = 'all';
+  var bQuery = '';
+  var openSet = {};
+  var session = null;
+  var doneStats = null;
+
+  var progress = {};
+  try { progress = JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) { progress = {}; }
+  function save() { try { localStorage.setItem(LS, JSON.stringify(progress)); } catch (e) {} }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function repOf(id) { var s = progress[id]; return s ? (s.r || 0) : 0; }
+  function dueOf(id) { var s = progress[id]; return s ? (s.due || 0) : 0; }
+  function isMastered(id) { return repOf(id) >= STAGES.length; }
+  function isDueNow(id, now) { var s = progress[id]; return !s || (s.due || 0) <= now; }
+
+  function rate(id, kind) {
+    var now = Date.now();
+    var s = progress[id] || { r: 0, due: 0 };
+    if (kind === 'ok') {
+      s.due = now + STAGES[Math.min(s.r, STAGES.length - 1)] * DAY;
+      s.r = Math.min(s.r + 1, STAGES.length);
+      s.ts = now;
+    } else if (kind === 'fuzzy') {
+      s.due = now + DAY;          // 模糊：维持原档位，1 天后再来
+      s.ts = now;
+    } else {
+      s.r = 0;                    // 不会：打回起点
+      s.due = now + DAY;
+      s.ts = now;
+    }
+    progress[id] = s;
+    save();
+  }
+  function stats() {
+    var now = Date.now(), due = 0, mastered = 0, started = 0;
+    for (var i = 0; i < BANK.length; i++) {
+      var id = BANK[i].id;
+      if (progress[id]) started++;
+      if (isMastered(id)) mastered++;
+      if (isDueNow(id, now)) due++;
+    }
+    return { due: due, mastered: mastered, started: started, total: BANK.length };
+  }
+  function buildQueue() {
+    var now = Date.now();
+    var list = BANK.filter(function (it) { return isDueNow(it.id, now); });
+    list.sort(function (a, b) { return (dueOf(a.id) - dueOf(b.id)) || (a.id - b.id); });
+    if (list.length) return list.slice(0, SESSION_MAX).map(function (it) { return it.id; });
+    // 全部排到未来时，退化为「从未做过的新题」
+    return BANK.filter(function (it) { return !progress[it.id]; })
+               .map(function (it) { return it.id; }).slice(0, SESSION_MAX);
+  }
+  function randomQueue() {
+    return BANK.map(function (x) { return x.id; })
+               .sort(function () { return Math.random() - .5; }).slice(0, SESSION_MAX);
+  }
+  function byId(id) {
+    for (var i = 0; i < BANK.length; i++) { if (BANK[i].id === id) return BANK[i]; }
+    return null;
+  }
+
+  function tagHtml(it, showBoard) {
+    var h = '<span class="no">#' + it.id + '</span>';
+    if (showBoard !== false) h += '<span class="tag b">' + esc(it.board) + '</span>';
+    h += '<span class="tag k">' + esc(it.kind) + '</span>';
+    return h;
+  }
+  function answerHtml(it) {
+    var h = '<div class="src">' + esc(it.src) + '</div>';
+    if (it.kind === '代码') {
+      var idea = String(it.idea || '').replace(/^思路[:：]\s*/, '');
+      if (idea) h += '<div class="idea"><b>思路　</b>' + esc(idea) + '</div>';
+      h += '<div class="codewrap"><button class="btn-copy" data-copy="' + it.id + '">复制</button>'
+         + '<pre class="code">' + esc(it.code) + '</pre></div>';
+    } else {
+      for (var i = 0; i < it.ans.length; i++) h += '<p class="ansp">' + esc(it.ans[i]) + '</p>';
+    }
+    return h;
+  }
+
+  /* ---------------- 浏览模式 ---------------- */
+  var FILTERS = [
+    { k: 'all', label: '全部' },
+    { k: '真题简答', label: '真题 · 简答' },
+    { k: '真题代码', label: '真题 · 代码' },
+    { k: '押题简答', label: '押题 · 简答' },
+    { k: '押题代码', label: '押题 · 代码' }
+  ];
+  function filtered() {
+    var q = bQuery.trim().toLowerCase();
+    return BANK.filter(function (it) {
+      if (bFilter !== 'all' && (it.board + it.kind) !== bFilter) return false;
+      if (!q) return true;
+      var hay = (it.q + ' ' + it.src + ' ' + (it.idea || '') + ' ' + (it.code || '') + ' '
+                + (it.ans || []).join(' ')).toLowerCase();
+      return hay.indexOf(q) >= 0;
+    });
+  }
+  function renderBrowse() {
+    var chips = FILTERS.map(function (f) {
+      return '<button class="chip' + (bFilter === f.k ? ' on' : '') + '" data-filter="' + f.k + '">'
+           + f.label + ' ' + (f.k === 'all' ? BANK.length : BANK.filter(function (it) { return (it.board + it.kind) === f.k; }).length)
+           + '</button>';
+    }).join('');
+    var h = '<div class="toolbar">'
+          + '<input id="search" class="search" type="search" placeholder="搜索题干、答案或代码…" value="' + esc(bQuery) + '">'
+          + '<div class="chips">' + chips + '</div>'
+          + '</div>'
+          + '<div id="count" class="count"></div>'
+          + '<div id="list"></div>';
+    var main = document.getElementById('main');
+    main.className = '';
+    main.innerHTML = h;
+    renderList();
+  }
+  function renderList() {
+    var list = filtered();
+    document.getElementById('count').textContent = '共 ' + list.length + ' 题';
+    var h = '';
+    if (!list.length) h = '<div class="empty">没有匹配的题目</div>';
+    list.forEach(function (it) {
+      var open = !!openSet[it.id];
+      h += '<article class="card' + (open ? ' open' : '') + '" data-toggle="' + it.id + '">'
+         + '<div class="chead">' + tagHtml(it)
+         + '<span class="grow"></span><span class="chev">›</span></div>'
+         + '<div class="q">' + esc(it.q) + '</div>'
+         + '<div class="body">' + answerHtml(it) + '</div>'
+         + '</article>';
+    });
+    document.getElementById('list').innerHTML = h;
+  }
+
+  /* ---------------- 自测首页 ---------------- */
+  function renderQuizHome() {
+    var s = stats();
+    var m = Math.round(s.mastered / s.total * 100);
+    var h = '<div class="stats">'
+          + '<div class="stat"><b>' + s.due + '</b><span>今日待复习</span></div>'
+          + '<div class="stat"><b>' + s.mastered + '</b><span>已掌握</span></div>'
+          + '<div class="stat"><b>' + s.total + '</b><span>题量总数</span></div>'
+          + '</div>'
+          + '<div class="bar"><i style="width:' + m + '%"></i></div>'
+          + '<div class="sec-title">掌握进度 ' + s.mastered + ' / ' + s.total + '（' + m + '%）</div>'
+          + '<button class="big-btn" id="start">' + (s.due ? '开始今日复习（' + Math.min(s.due, SESSION_MAX) + ' 题）' : '今日已复习完，随意刷一遍') + '</button>'
+          + '<button class="ghost-btn" id="random">随机抽 20 题过一遍</button>'
+          + '<div class="hint">复习曲线：会 → 1 / 2 / 4 / 7 天后，之后固定 7 天；模糊 → 明天再来；不会 → 打回起点。<br>'
+          + '未做过的新题会直接进入「今日待复习」。学习记录保存在本机浏览器，不上传。</div>';
+    var main = document.getElementById('main');
+    main.className = '';
+    main.innerHTML = h;
+    document.getElementById('foot').className = 'hidden';
+  }
+
+  /* ---------------- 自测会话 ---------------- */
+  function startSession(ids) {
+    doneStats = null;
+    session = { queue: ids.slice(), idx: 0, revealed: false, rated: 0, againSeen: {} };
+    if (!session.queue.length) { session = null; render(); return; }
+    render();
+  }
+  function renderSession() {
+    var total = session.queue.length;
+    var pos = Math.min(session.idx + 1, total);
+    var pct = Math.round(session.rated / total * 100);
+    var it = byId(session.queue[session.idx]);
+    var h = '<div class="sess-head"><span>' + pos + ' / ' + total + '</span><span>会 ' + session.rated + ' 题</span></div>'
+          + '<div class="bar"><i style="width:' + pct + '%"></i></div>'
+          + '<article class="card qcard sesscard">'
+          + '<div class="chead">' + tagHtml(it) + '</div>'
+          + '<div class="q">' + esc(it.q) + '</div>'
+          + (session.revealed ? '<div class="body show" style="display:block">' + answerHtml(it) + '</div>' : '')
+          + '</article>';
+    var main = document.getElementById('main');
+    main.className = '';
+    main.innerHTML = h;
+
+    var foot = document.getElementById('foot');
+    foot.className = '';
+    if (session.revealed) {
+      foot.innerHTML = '<div class="rate-row">'
+        + '<button class="rate bad" data-rate="bad">不会</button>'
+        + '<button class="rate fuzzy" data-rate="fuzzy">模糊</button>'
+        + '<button class="rate ok" data-rate="ok">会</button>'
+        + '</div><div class="tip">不会的题稍后还会再出现一次</div>';
+      var rs = foot.querySelectorAll('[data-rate]');
+      for (var i = 0; i < rs.length; i++) {
+        rs[i].onclick = (function (kind) {
+          return function () { applyRate(kind); };
+        })(rs[i].getAttribute('data-rate'));
+      }
+    } else {
+      foot.innerHTML = '<button class="reveal" id="reveal">显示答案</button>';
+      foot.querySelector('#reveal').onclick = function () {
+        session.revealed = true;
+        renderSession();
+      };
+    }
+  }
+  function applyRate(kind) {
+    if (!session) return;
+    var id = session.queue[session.idx];
+    rate(id, kind);
+    session.rated++;
+    if (kind === 'bad' && !session.againSeen[id]) { session.againSeen[id] = 1; session.queue.push(id); }
+    session.idx++;
+    session.revealed = false;
+    if (session.idx >= session.queue.length) {
+      doneStats = { n: session.rated };
+      session = null;
+      renderComplete();
+      return;
+    }
+    renderSession();
+  }
+  function renderComplete() {
+    var s = stats();
+    var h = '<div class="empty" style="padding-top:26px">'
+          + '<div style="font-size:17px;color:var(--ink);font-weight:500;margin-bottom:6px">本轮完成</div>'
+          + '共复习 ' + (doneStats ? doneStats.n : 0) + ' 题'
+          + '<br>今日还剩 ' + s.due + ' 题待复习'
+          + '</div>'
+          + '<button class="big-btn" id="again">再刷一轮</button>'
+          + '<button class="ghost-btn" id="backhome">返回自测首页</button>';
+    var main = document.getElementById('main');
+    main.className = '';
+    main.innerHTML = h;
+    document.getElementById('foot').className = 'hidden';
+  }
+  function render() {
+    if (mode === 'browse') { document.getElementById('foot').className = 'hidden'; renderBrowse(); return; }
+    if (session) { renderSession(); return; }
+    if (doneStats) { renderComplete(); return; }
+    renderQuizHome();
+  }
+
+  /* ---------------- 事件 ---------------- */
+  function copyText(txt, btn) {
+    var done = function () {
+      btn.textContent = '已复制'; btn.className = 'btn-copy ok';
+      setTimeout(function () { btn.textContent = '复制'; btn.className = 'btn-copy'; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallback(txt, done); });
+    } else { fallback(txt, done); }
+  }
+  function fallback(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  document.querySelector('.seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-mode]');
+    if (!b) return;
+    mode = b.getAttribute('data-mode');
+    document.getElementById('m-browse').className = (mode === 'browse' ? 'on' : '');
+    document.getElementById('m-quiz').className = (mode === 'quiz' ? 'on' : '');
+    if (mode === 'browse') { session = null; }
+    render();
+  });
+
+  var mainEl = document.getElementById('main');
+  mainEl.addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (chip) { bFilter = chip.getAttribute('data-filter'); renderBrowse(); return; }
+
+    var cp = e.target.closest('.btn-copy');
+    if (cp) {
+      var cid = parseInt(cp.getAttribute('data-copy'), 10);
+      var cit = byId(cid);
+      if (cit) copyText(cit.code, cp);
+      return;
+    }
+    var card = e.target.closest('article.card');
+    if (card && mode === 'browse' && !session) {
+      var id = parseInt(card.getAttribute('data-toggle'), 10);
+      if (openSet[id]) { delete openSet[id]; card.classList.remove('open'); }
+      else { openSet[id] = 1; card.classList.add('open'); }
+      return;
+    }
+    if (session && card) { session.revealed = true; renderSession(); return; }
+
+    if (e.target.closest('#start')) { startSession(buildQueue()); return; }
+    if (e.target.closest('#random')) { startSession(randomQueue()); return; }
+    if (e.target.closest('#again')) { doneStats = null; startSession(buildQueue()); return; }
+    if (e.target.closest('#backhome')) { doneStats = null; renderQuizHome(); return; }
+  });
+
+  mainEl.addEventListener('input', function (e) {
+    if (e.target.id === 'search') {
+      bQuery = e.target.value;
+      renderList();
+    }
+  });
+
+  document.getElementById('m-browse').className = 'on';
+  render();
+})();
+</script>
+</body>
+</html>
